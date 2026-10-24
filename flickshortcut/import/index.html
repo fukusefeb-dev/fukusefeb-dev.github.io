@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<meta name="apple-itunes-app" content="app-id=6760250369">
+<title>フリックショートカット</title>
+<style>
+  :root { color-scheme: light dark; --bg: #f2f2f7; --card: #ffffff; --text: #1c1c1e; --sub: #6e6e73; }
+  @media (prefers-color-scheme: dark) { :root { --bg: #000000; --card: #1c1c1e; --text: #f2f2f7; --sub: #98989f; } }
+  body { margin: 0; background: var(--bg); color: var(--text);
+         font-family: -apple-system, BlinkMacSystemFont, "Hiragino Sans", sans-serif; }
+  main { max-width: 420px; margin: 0 auto; padding: 48px 16px; text-align: center; }
+  .card { background: var(--card); border-radius: 20px; padding: 28px 20px; }
+  .icon { width: 64px; height: 64px; border-radius: 16px; margin: 0 auto 16px;
+          background: linear-gradient(135deg, #4f46e5, #7c3aed); display: flex;
+          align-items: center; justify-content: center; color: #fff; font-size: 30px; }
+  h1 { font-size: 20px; margin: 0 0 8px; }
+  p { color: var(--sub); font-size: 14px; line-height: 1.6; margin: 0 0 20px; }
+  a.button { display: block; padding: 14px; border-radius: 14px; font-weight: 600;
+             text-decoration: none; margin-top: 10px; font-size: 16px; }
+  .primary { background: linear-gradient(90deg, #4f46e5, #7c3aed); color: #fff; }
+  .secondary { background: transparent; color: #4f46e5; border: 1px solid #4f46e5; }
+  .error { color: #d70015; }
+</style>
+</head>
+<body>
+<main>
+  <div class="card">
+    <div class="icon">⌨︎</div>
+    <h1 id="title">ショートカットが共有されました</h1>
+    <p id="desc">「フリックショートカット」アプリで開くと、共有されたショートカットを追加できます。</p>
+    <a class="button primary" id="open" href="#">アプリで開く</a>
+    <a class="button secondary" id="store" href="https://apps.apple.com/app/id6760250369">App Storeで入手</a>
+  </div>
+</main>
+<script>
+  // 共有データは URL の # 以降（フラグメント）にあり、サーバーには送信されない。
+  (function () {
+    var en = !(navigator.language || "").toLowerCase().startsWith("ja");
+    if (en) {
+      document.documentElement.lang = "en";
+      document.getElementById("title").textContent = "Shortcuts were shared with you";
+      document.getElementById("desc").textContent = "Open in the Flick Shortcut app to add the shared shortcuts.";
+      document.getElementById("open").textContent = "Open in App";
+      document.getElementById("store").textContent = "Get it on the App Store";
+    }
+    var params = new URLSearchParams(location.hash.slice(1));
+    var data = params.get("data");
+    var open = document.getElementById("open");
+    if (data && /^[A-Za-z0-9_-]+$/.test(data)) {
+      open.href = "flickshortcut://import?data=" + data;
+    } else {
+      open.style.display = "none";
+      var desc = document.getElementById("desc");
+      desc.className = "error";
+      desc.textContent = en ? "This link is incomplete. Please ask the sender to share it again."
+                            : "リンクが正しくありません。共有した人にもう一度送ってもらってください。";
+    }
+  })();
+</script>
+</body>
+</html>
