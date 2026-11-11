@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex">
+<title>MultiMovie</title>
+<style>
+body{font:16px/1.7 -apple-system,sans-serif;max-width:560px;margin:0 auto;padding:32px 16px;text-align:center}
+h1{font-size:22px}
+a.b{display:block;margin:14px auto;padding:14px 18px;border-radius:12px;text-decoration:none;font-weight:700;max-width:320px}
+a.open{background:#ffd600;color:#111}
+a.store{background:#1c1f27;color:#fff}
+p.s{color:#666;font-size:14px}
+ul{text-align:left;font-size:13px;color:#444;word-break:break-all;padding-left:20px}
+</style></head>
+<body>
+<h1 id="title">MultiMovie</h1>
+<p id="lead"></p>
+<ul id="pages"></ul>
+<a class="b open" id="open" href="#"></a>
+<a class="b store" id="store" href="https://apps.apple.com/app/id6831824747"></a>
+<p class="s" id="note"></p>
+<script>
+(function(){
+  var ja = (navigator.language || '').toLowerCase().indexOf('ja') === 0;
+  var t = ja ? {
+    lead: 'MultiMovie のレイアウトが共有されました。',
+    open: 'MultiMovie で開く', store: 'App Store で MultiMovie を入手',
+    note: 'アプリを入れてから「MultiMovie で開く」を押してください。追加する前に、アプリの中で開くページを確認できます。',
+    bad: 'このリンクは読み取れませんでした。'
+  } : {
+    lead: 'A MultiMovie layout was shared with you.',
+    open: 'Open in MultiMovie', store: 'Get MultiMovie on the App Store',
+    note: 'Install the app, then tap "Open in MultiMovie". You can check the pages in the app before adding the layout.',
+    bad: 'This link could not be read.'
+  };
+  var d = location.hash.replace(/^#/, '');
+  var ok = /^[A-Za-z0-9_-]{8,8000}$/.test(d);
+  document.getElementById('store').textContent = t.store;
+  document.getElementById('note').textContent = t.note;
+  var open = document.getElementById('open');
+  if (!ok) {
+    document.getElementById('lead').textContent = t.bad;
+    open.style.display = 'none';
+    return;
+  }
+  document.getElementById('lead').textContent = t.lead;
+  open.textContent = t.open;
+  open.href = 'multimovie://import?d=' + d;
+  // 内容（名前と URL）を文字として見せる。HTML としては扱わない
+  try {
+    var b = d.replace(/-/g, '+').replace(/_/g, '/');
+    while (b.length % 4) b += '=';
+    var bytes = Uint8Array.from(atob(b), function(c){ return c.charCodeAt(0); });
+    var data = JSON.parse(new TextDecoder().decode(bytes));
+    if (data.n) document.getElementById('title').textContent = String(data.n).slice(0, 40);
+    (data.tiles || []).slice(0, 4).forEach(function(x){
+      if (!x || !/^https?:\/\//i.test(x.u || '')) return;
+      var li = document.createElement('li');
+      li.textContent = String(x.u).slice(0, 300);
+      document.getElementById('pages').appendChild(li);
+    });
+  } catch (e) {}
+})();
+</script>
+</body></html>
